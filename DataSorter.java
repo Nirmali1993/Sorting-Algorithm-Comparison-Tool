@@ -162,6 +162,250 @@ class SortResult {
         this.executionTime = executionTime;
     }
 }
+
+// Member 4: Main Application Class - UI, Data Generation, Performance Comparison
+public class DataSorter {
+    private int[] data;
+    private Scanner scanner;
+    
+    public DataSorter() {
+        this.data = new int[0];
+        this.scanner = new Scanner(System.in);
+    }
+    
+    public void displayMenu() {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("--- Data Sorter: Sorting Algorithm Comparison Tool ---");
+        System.out.println("=".repeat(60));
+        System.out.println("1. Enter numbers manually");
+        System.out.println("2. Generate random numbers");
+        System.out.println("3. Perform Bubble Sort");
+        System.out.println("4. Perform Merge Sort");
+        System.out.println("5. Perform Quick Sort");
+        System.out.println("6. Compare all algorithms (show performance table)");
+        System.out.println("7. Exit");
+        System.out.println("=".repeat(60));
+    }
+    
+    public void enterNumbersManually() {
+        try {
+            System.out.println("\nEnter numbers separated by spaces:");
+            System.out.print("> ");
+            String input = scanner.nextLine();
+            
+            String[] numbers = input.trim().split("\\s+");
+            data = new int[numbers.length];
+            
+            for (int i = 0; i < numbers.length; i++) {
+                data[i] = Integer.parseInt(numbers[i]);
+            }
+            
+            System.out.println("✓ Successfully stored " + data.length + " numbers: " + 
+                             Arrays.toString(data));
+        } catch (NumberFormatException e) {
+            System.out.println("✗ Error: Please enter valid integers only.");
+        }
+    }
+    
+    public void generateRandomNumbers() {
+        try {
+            System.out.print("\nEnter the number of elements to generate: ");
+            int size = Integer.parseInt(scanner.nextLine());
+            
+            if (size <= 0) {
+                System.out.println("✗ Error: Please enter a positive number.");
+                return;
+            }
+            
+            System.out.print("Enter minimum value: ");
+            int minVal = Integer.parseInt(scanner.nextLine());
+            
+            System.out.print("Enter maximum value: ");
+            int maxVal = Integer.parseInt(scanner.nextLine());
+            
+            if (minVal > maxVal) {
+                System.out.println("✗ Error: Minimum value cannot be greater than maximum value.");
+                return;
+            }
+            
+            Random random = new Random();
+            data = new int[size];
+            
+            for (int i = 0; i < size; i++) {
+                data[i] = random.nextInt(maxVal - minVal + 1) + minVal;
+            }
+            
+            System.out.println("✓ Generated " + data.length + " random numbers");
+            System.out.print("Data preview: ");
+            printArrayPreview(data);
+        } catch (NumberFormatException e) {
+            System.out.println("✗ Error: Please enter valid integers.");
+        }
+    }
+    
+    public void performSort(String algorithmName, SortResult result) {
+        if (data.length == 0) {
+            System.out.println("✗ Error: No data available. Please enter or generate data first.");
+            return;
+        }
+        
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Performing " + algorithmName + "...");
+        System.out.println("=".repeat(60));
+        System.out.print("Original data: ");
+        printArrayPreview(data);
+        
+        System.out.print("\nSorted data: ");
+        printArrayPreview(result.sortedArray);
+        
+        System.out.println("\n📊 Performance Metrics:");
+        System.out.printf("   Steps/Operations: %,d%n", result.steps);
+        System.out.printf("   Execution Time: %.4f ms%n", result.executionTime);
+    }
+    
+    public void compareAllAlgorithms() {
+        if (data.length == 0) {
+            System.out.println("✗ Error: No data available. Please enter or generate data first.");
+            return;
+        }
+        
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Comparing All Sorting Algorithms");
+        System.out.println("=".repeat(60));
+        System.out.println("Dataset size: " + data.length + " elements");
+        System.out.print("Data preview: ");
+        printArrayPreview(data);
+        
+        // Run all algorithms
+        List<SortResult> results = new ArrayList<>();
+        
+        System.out.println("\nRunning Bubble Sort...");
+        results.add(BubbleSort.sort(data));
+        
+        System.out.println("Running Merge Sort...");
+        results.add(MergeSort.sort(data));
+        
+        System.out.println("Running Quick Sort...");
+        results.add(QuickSort.sort(data));
+        
+        // Sort results by execution time for ranking
+        results.sort(Comparator.comparingDouble(r -> r.executionTime));
+        
+        // Display comparison table
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Performance Comparison Results");
+        System.out.println("=".repeat(60));
+        System.out.printf("%-15s %-15s %-15s %-10s%n", "Algorithm", "Steps", "Time (ms)", "Rank");
+        System.out.println("-".repeat(60));
+        
+        for (int i = 0; i < results.size(); i++) {
+            SortResult result = results.get(i);
+            System.out.printf("%-15s %-15s %-15.4f #%d%n", 
+                            result.name, 
+                            String.format("%,d", result.steps), 
+                            result.executionTime, 
+                            i + 1);
+        }
+        
+        System.out.println("=".repeat(60));
+        
+        // Display analysis
+        SortResult fastest = results.get(0);
+        SortResult slowest = results.get(results.size() - 1);
+        
+        System.out.println("\n📈 Analysis:");
+        System.out.printf("   Fastest Algorithm: %s (%.4f ms)%n", fastest.name, fastest.executionTime);
+        System.out.printf("   Slowest Algorithm: %s (%.4f ms)%n", slowest.name, slowest.executionTime);
+        
+        if (fastest.executionTime > 0) {
+            double speedup = slowest.executionTime / fastest.executionTime;
+            System.out.printf("   Speed Difference: %.2fx faster%n", speedup);
+        }
+    }
+    
+    private void printArrayPreview(int[] arr) {
+        int previewLimit = 20;
+        if (arr.length <= previewLimit) {
+            System.out.println(Arrays.toString(arr));
+        } else {
+            System.out.print("[");
+            for (int i = 0; i < previewLimit; i++) {
+                System.out.print(arr[i]);
+                if (i < previewLimit - 1) System.out.print(", ");
+            }
+            System.out.println("...]");
+        }
+    }
+    
+    public void run() {
+        System.out.println("\n🎯 Welcome to Data Sorter!");
+        
+        while (true) {
+            displayMenu();
+            
+            try {
+                System.out.print("\nEnter your choice (1-7): ");
+                String choice = scanner.nextLine().trim();
+                
+                switch (choice) {
+                    case "1":
+                        enterNumbersManually();
+                        break;
+                    
+                    case "2":
+                        generateRandomNumbers();
+                        break;
+                    
+                    case "3":
+                        if (data.length > 0) {
+                            SortResult result = BubbleSort.sort(data);
+                            performSort("Bubble Sort", result);
+                        } else {
+                            System.out.println("✗ Error: No data available.");
+                        }
+                        break;
+                    
+                    case "4":
+                        if (data.length > 0) {
+                            SortResult result = MergeSort.sort(data);
+                            performSort("Merge Sort", result);
+                        } else {
+                            System.out.println("✗ Error: No data available.");
+                        }
+                        break;
+                    
+                    case "5":
+                        if (data.length > 0) {
+                            SortResult result = QuickSort.sort(data);
+                            performSort("Quick Sort", result);
+                        } else {
+                            System.out.println("✗ Error: No data available.");
+                        }
+                        break;
+                    
+                    case "6":
+                        compareAllAlgorithms();
+                        break;
+                    
+                    case "7":
+                        System.out.println("\n👋 Thank you for using Data Sorter. Goodbye!");
+                        scanner.close();
+                        return;
+                    
+                    default:
+                        System.out.println("✗ Invalid choice. Please enter a number between 1 and 7.");
+                }
+            } catch (Exception e) {
+                System.out.println("✗ An error occurred: " + e.getMessage());
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+        DataSorter app = new DataSorter();
+        app.run();
+    }
+}
 //Welcome to the group projet 02
 
 
