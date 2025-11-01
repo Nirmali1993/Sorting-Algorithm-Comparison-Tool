@@ -31,6 +31,7 @@ class BubbleSort {
 }
 
 // Member 2: Merge Sort Implementation
+
 class MergeSort {
     private static long steps;
     
