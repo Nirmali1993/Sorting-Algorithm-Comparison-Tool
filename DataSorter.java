@@ -99,6 +99,69 @@ class MergeSort {
         }
     }
 }
+
+// Member 3: Quick Sort Implementation
+class QuickSort {
+    private static long steps;
+    
+    public static SortResult sort(int[] arr) {
+        int[] arrCopy = arr.clone();
+        steps = 0;
+        
+        long startTime = System.nanoTime();
+        
+        quickSortRecursive(arrCopy, 0, arrCopy.length - 1);
+        
+        long endTime = System.nanoTime();
+        double executionTime = (endTime - startTime) / 1_000_000.0;
+        
+        return new SortResult("Quick Sort", arrCopy, steps, executionTime);
+    }
+    
+    private static void quickSortRecursive(int[] arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            quickSortRecursive(arr, low, pi - 1);
+            quickSortRecursive(arr, pi + 1, high);
+        }
+    }
+    
+    private static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high];
+        int i = low - 1;
+        
+        for (int j = low; j < high; j++) {
+            steps++;
+            if (arr[j] <= pivot) {
+                i++;
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        
+        int temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+        
+        return i + 1;
+    }
+}
+
+// Result class to store sorting results
+class SortResult {
+    String name;
+    int[] sortedArray;
+    long steps;
+    double executionTime;
+    
+    public SortResult(String name, int[] sortedArray, long steps, double executionTime) {
+        this.name = name;
+        this.sortedArray = sortedArray;
+        this.steps = steps;
+        this.executionTime = executionTime;
+    }
+}
 //Welcome to the group projet 02
 
 
