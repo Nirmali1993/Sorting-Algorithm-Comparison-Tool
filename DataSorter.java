@@ -163,7 +163,8 @@ class SortResult {
     }
 }
 
-// Member 4: Main Application Class - UI, Data Generation, Performance Comparison
+// Member 4: Main Application Class - UI, Data Generation and Performance Comparison
+
 public class DataSorter {
     private int[] data;
     private Scanner scanner;
